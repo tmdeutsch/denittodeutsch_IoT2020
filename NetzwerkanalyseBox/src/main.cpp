@@ -17,8 +17,8 @@ rgb_lcd lcd;
 const int colorR = 255;
 const int colorG = 120;
 const int colorB = 0;
-const char* ssid = "R2DLan";
-const char* password = "49761671295406304116";
+const char* ssid = "";
+const char* password = "";
 const char *broker = "test.mosquitto.org";         //Adresse des Brokers
 const char *topic = "thkoeln/IoT/wohnzimmer/whatever"; //Ein Topic
 
