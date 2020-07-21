@@ -6,8 +6,8 @@
 #include <Adafruit_Sensor.h>
 #include "rgb_lcd.h"
  
-const char *ssid = "R2DLan";                        //Name des Netzwerks
-const char *pass = "49761671295406304116";          //Passwort des Netzwerks
+const char *ssid = "";                        //Name des Netzwerks
+const char *pass = "";          //Passwort des Netzwerks
 const char *broker = "test.mosquitto.org";          //Adresse des Brokers
 const char *topic = "thkoeln/IoT/wohnzimmer/ledlight";  //Ein Topic
  
