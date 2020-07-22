@@ -8,7 +8,7 @@
  
 const char *ssid = "";                        //Name des Netzwerks
 const char *pass = "";          //Passwort des Netzwerks
-const char *broker = "test.mosquitto.org";          //Adresse des Brokers
+const char *broker = "mqtt.eclipse.org";          //Adresse des Brokers
 const char *topic = "thkoeln/IoT/wohnzimmer/ledlight";  //Ein Topic
  
 #define LEDPIN 33
@@ -17,9 +17,9 @@ const char *topic = "thkoeln/IoT/wohnzimmer/ledlight";  //Ein Topic
 #define DHTTYPE DHT11
 DHT dht(DHTPIN, DHTTYPE);
 rgb_lcd lcd;
-const int colorR = 255;
-const int colorG = 0;
-const int colorB = 255;
+const int colorR = 112;
+const int colorG = 100;
+const int colorB = 238;
  
 bool lampOn = true;
 int buttonState = 0;
@@ -32,7 +32,7 @@ char messages[50];
 /*** Initales verbinden mit WLAN ***/
 void setupWifi()
 {
-  Serial.print("\nConnecting to");
+  Serial.print("\nConnecting to ");
   Serial.println(ssid);
  
   WiFi.begin(ssid, pass);
@@ -52,11 +52,11 @@ void reconnect()
 {
   while (!client.connected())
   {
-    Serial.print("\nConencting to");
+    Serial.print("\nConencting to ");
     Serial.println(broker);
     if (client.connect("ESP8266ClientDeNittoDeutsch-")) //ClientName am Server, sollte unique sein
     {
-      Serial.print("\nConnected to");
+      Serial.print("\nConnected to ");
       Serial.println(broker);
       client.subscribe(topic);
     }
