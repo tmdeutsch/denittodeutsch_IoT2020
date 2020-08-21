@@ -1,189 +1,171 @@
+// Inkludieren von Bibliotheken & anderen "Helferdateien"
 #include <Arduino.h>
+#include <stdlib.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <Wire.h>
 #include <DHT.h>
 #include <Adafruit_Sensor.h>
 #include "rgb_lcd.h"
- 
-const char *ssid = "";                        //Name des Netzwerks
-const char *pass = "";          //Passwort des Netzwerks
-const char *broker = "mqtt.eclipse.org";          //Adresse des Brokers
-const char *topic = "thkoeln/IoT/wohnzimmer/ledlight";  //Ein Topic
- 
-#define LEDPIN 33
-#define BUTTONPIN 26
-#define DHTPIN 14
-#define DHTTYPE DHT11
+#include "WIFI_DATA.h"
+#include "BROKER_TOPICS_PINS.h"
+#include "SENSOR_FUNCTIONS.H"
+
+// DHT ist eine Bibliothek für Temperatur- / Feuchtigkeitssensoren der DHT-Serie. Klasse, die Status und Funktionen für DHT speichert
 DHT dht(DHTPIN, DHTTYPE);
+
+// LCD-Display Settings (Initialisierung & Farbe)
 rgb_lcd lcd;
-const int colorR = 112;
-const int colorG = 100;
-const int colorB = 238;
- 
-bool lampOn = true;
+const int colorR = 250;
+const int colorG = 50;
+const int colorB = 50;
+
+// Status des Buttons (gedrückt oder nicht)
 int buttonState = 0;
 int savedState = 0;
 
+// WIFI & PubSub Client definieren 
 WiFiClient espClient;
 PubSubClient client(espClient);
-char messages[50];
 
-/*** Initales verbinden mit WLAN ***/
-void setupWifi()
-{
-  Serial.print("\nConnecting to ");
-  Serial.println(ssid);
- 
-  WiFi.begin(ssid, pass);
- 
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(100);
-    Serial.println(WiFi.status());
-  }
- 
-  Serial.print("\nConnected to");
-  Serial.println(ssid);
-}
-
-/*** Connenct/Reconnect to MQTT Broker in Case of Connection loss ***/
+// Connenct/Reconnect mit MQTT Broker, falls Verbindungsaufbau fehlschlägt oder die Verbindung verloren geht
 void reconnect()
 {
   while (!client.connected())
   {
     Serial.print("\nConencting to ");
     Serial.println(broker);
-    if (client.connect("ESP8266ClientDeNittoDeutsch-")) //ClientName am Server, sollte unique sein
+    if (client.connect("ESP8266ClientDeNittoDeutsch-")) // Clientname am Server
     {
       Serial.print("\nConnected to ");
       Serial.println(broker);
-      client.subscribe(topic);
+      client.subscribe(lati_topicMobile);
+      client.subscribe(longi_topicMobile);
+      client.subscribe(wifi_topicMobile);
     }
     else
     {
       Serial.print("\nTrying again...");
-      delay(5000);
+      delay(5000); 
     }
   }
 }
 
-void changeLED(bool val)
-{
-  if (val == 1)
-  {
-    digitalWrite(LEDPIN, HIGH);
-  }
-  else
-  {
-    digitalWrite(LEDPIN, LOW);
-  }
-}
- 
-/*** Funktion welche ausgeführt wird, wenn eine Nachricht auf einem abbonierten Topic ankommt ***/
+
+ /*** Funktion welche ausgeführt wird, wenn eine Nachricht auf einem abbonierten Topic ankommt ***/
 void callback(char *topic, byte *payload, unsigned int length)
 {
-  Serial.print("Received messages: ");
-  Serial.println(topic);
-  for (int i = 0; i < length; i++)
+      Serial.print("Received messages!");
+
+
+
+      if(topic[24] == lati_topicMobile[24]){
+
+        for (int i = 0; i < length; i++)
   {
     Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+    latitude[i] = (char)payload[i];
   }
- 
+      
+      client.publish(lati_topic, latitude);                 // Nachricht auf Topic publishen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Detecting lati..");                        // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+      delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.clear();                                          // LCD-Display bereinigen
+      }
+
+      if(topic[26] == longi_topicMobile[26]){
+
+                for (int i = 0; i < length; i++)
+  {
+    Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+    longitude[i] = (char)payload[i];
+  }
+      
+      client.publish(longi_topic, longitude);               // Nachricht auf Topic publishen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Detecting long..");                        // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+      delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.clear();                                          // LCD-Display bereinigen
+      
+      }
+     if(topic[23] == wifi_topicMobile[23]){
+
+               for (int i = 0; i < length; i++)
+  {
+    Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+    wifi[i] = (char)payload[i];
+  }
+      
+      client.publish(wifi_topic, wifi);                     // Nachricht auf Topic publishen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Detecting net...");                        // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+      delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.clear();                                          // LCD-Display bereinigen
+      
+      }
+
+
   if ((char)payload[0] == '1')
   {
-    //lcd.println("Button gedrückt!");
-    changeLED(true);
-    lampOn = true;
-    //delay(500);
-    //lcd.clear();
 
   }
   else
   {
-    //lcd.println("Button nicht gedrückt!");
-    changeLED(false);
-    lampOn = false;
-    //delay(500);
-    //lcd.clear();
+
   }
   Serial.println();
 }
- 
-void setup()
+
+ void setup()
 {
   Serial.begin(9600);
-  pinMode(LEDPIN, OUTPUT);
-  pinMode(BUTTONPIN, INPUT);
-  setupWifi();
-  client.setServer(broker, 1883);
+  pinMode(LEDPIN, OUTPUT); // PIN für LED
+  pinMode(BUTTONPIN, INPUT); // PIN für Button
+  setupWifi(); // ESP mit WLAN verbinden
+  client.setServer(broker, 1883); // client mit Broker und Port verbinden
   client.setCallback(callback);
-  digitalWrite(LEDPIN, HIGH);
-  lcd.begin(16, 2);
+  digitalWrite(LEDPIN, HIGH); // LCD Screen
+
+  // LCD aktivieren, Farben setzen, Beide Zeilen mit Begrüßung etc. befüllen
+  lcd.begin(16, 2); 
   lcd.setRGB(colorR, colorG, colorB);
+  lcd.setCursor(1, 0);
+  lcd.println("PWM-Analysebox  ");
+  lcd.setCursor(0, 1);
+  lcd.println("Push Button pls.");
 }
- 
+
+
+
+// ESP loop
 void loop()
 {
-  if (!client.connected())
+  if (!client.connected()) // Wenn keine Verbindung besteht, reconnect() zum erneuten Verbindungsaufbau aufrufen
   {
     reconnect();
   }
   client.loop();
-  buttonState = digitalRead(BUTTONPIN);
-  if (buttonState == HIGH)
+  buttonState = digitalRead(BUTTONPIN); // aktuellen Button-Status (gedrückt oder nicht) abfragen
+  if (buttonState == HIGH) // Falls der Button gedrückt wurde...
   {
-    if (savedState != HIGH)
+    if (savedState != HIGH) // ...und der Status nicht vorher schon als "gedrückt" im savedState ist... 
     { 
-      lcd.println("Button gedrückt!");
-      delay(1000);
-      lcd.clear();
-      snprintf(messages, 75, "%i", !lampOn); // Bool/int zu String
-      client.publish(topic, messages);       //Nachricht auf Topic publishen (geht auch direkt mit String)
+
     }
-    savedState = HIGH;
+    savedState = HIGH;                                      // savedstate des Buttons auf "gedrückt" setzen
   }
   else
   {
-    savedState = LOW;
+    savedState = LOW;                                       // savedstate des Buttons auf "nicht gedrückt" setzen
   }
 }
-
-String getTemperature() {
-
-  float t = dht.readTemperature();
-
-  if (isnan(t)) {    
-    Serial.println("Failed to read from Temperature sensor!");
-    return "--";
-  }
-  else {
-    Serial.println(t);
-    return String(t);
-  }
-}
-
-String getHumidity() {
-  float h = dht.readHumidity();
-  if (isnan(h)) {
-    Serial.println("Failed to read from Humidity sensor!");
-    return "--";
-  }
-  else {
-    Serial.println(h);
-    return String(h);
-  }
-}
-
-//  boolean pressed = digitalRead(PIN_BTN);  
-//  if(pressed == true){
-//  digitalWrite(PIN,HIGH);
-//  String temp  = getTemperature();
-//  lcd.println("Licht an.");
-//  lcd.println("Temp:" + temp);
-//  delay(1000);
-//  lcd.clear();
-//  digitalWrite(PIN,LOW);
-//  lcd.println("Lampe aus...");
-//  delay(1000);
-//  lcd.clear();

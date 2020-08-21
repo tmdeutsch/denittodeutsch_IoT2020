@@ -2,6 +2,7 @@
 ## Eclipse
 #################
 
+WIFI_DATA.h
 *.pydevproject
 .project
 .metadata
