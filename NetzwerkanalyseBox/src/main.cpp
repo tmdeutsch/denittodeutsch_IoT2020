@@ -42,6 +42,7 @@ void reconnect()
       client.subscribe(lati_topicMobile);
       client.subscribe(longi_topicMobile);
       client.subscribe(wifi_topicMobile);
+      client.subscribe(mobile_topicMobile);
     }
     else
     {
@@ -95,13 +96,13 @@ void callback(char *topic, byte *payload, unsigned int length)
       lcd.clear();                                          // LCD-Display bereinigen
       
       }
-     if(topic[23] == wifi_topicMobile[23]){
+    if(topic[23] == wifi_topicMobile[23]){
 
-               for (int i = 0; i < length; i++)
-  {
-    Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
-    wifi[i] = (char)payload[i];
-  }
+      for (int i = 0; i < length; i++)
+      {
+        Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+        wifi[i] = (char)payload[i];
+      }
       
       client.publish(wifi_topic, wifi);                     // Nachricht auf Topic publishen
       lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
@@ -112,17 +113,25 @@ void callback(char *topic, byte *payload, unsigned int length)
       delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.clear();                                          // LCD-Display bereinigen
       
-      }
-
-
-  if ((char)payload[0] == '1')
-  {
-
   }
-  else
-  {
+  if(topic[25] == mobile_topicMobile[25]){
 
+    for (int i = 0; i < length; i++){
+      Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
+      mobile[i] = (char)payload[i];
+    }
+
+    client.publish(mobile_topic, mobile);                 // Nachricht auf Topic publishen
+    lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+    lcd.println("Detecting cell..");                        // Ausgabe auf LCD-Display
+    delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+    lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+    lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+    delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+    lcd.clear();                                          // LCD-Display bereinigen
+        
   }
+
   Serial.println();
 }
 
@@ -160,7 +169,34 @@ void loop()
   {
     if (savedState != HIGH) // ...und der Status nicht vorher schon als "gedrückt" im savedState ist... 
     { 
+// Hier werden die Temperatur- und Luftfeuchtigkeit über den Sensor abgefragt, gepublished & Infos dazu auf dem LCD-Display ausgegeben
+      lcd.clear();
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Button pushed.  ");                      // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      sprintf(temperature, "%f", getTemperature(dht));      // die Temperatur wird für den publish umgewandelt
+      client.publish(temp_topic, temperature);              // Nachricht auf Topic publishen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Detecting Temp..");                      // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+      delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.clear();                                          // LCD-Display bereinigen
 
+      sprintf(humidity, "%f", getHumidity(dht));            // die Luftfeuchtigkeit wird für den publish umgewandelt
+      client.publish(hum_topic, humidity);                  //Nachricht auf Topic publishen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Detecting Humi..");                      // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+      delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.clear();                                          // LCD-Display bereinigen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("FINISHED!       ");                      // Ausgabe auf LCD-Display
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("Thank you! - PWM");                      // Ausgabe auf LCD-Display
     }
     savedState = HIGH;                                      // savedstate des Buttons auf "gedrückt" setzen
   }
