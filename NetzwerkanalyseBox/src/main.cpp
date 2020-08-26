@@ -16,9 +16,9 @@ DHT dht(DHTPIN, DHTTYPE);
 
 // LCD-Display Settings (Initialisierung & Farbe)
 rgb_lcd lcd;
-const int colorR = 250;
-const int colorG = 50;
-const int colorB = 50;
+const int colorR = 100;
+const int colorG = 150;
+const int colorB = 250;
 
 // Status des Buttons (gedrückt oder nicht)
 int buttonState = 0;
@@ -35,7 +35,7 @@ void reconnect()
   {
     Serial.print("\nConencting to ");
     Serial.println(broker);
-    if (client.connect("ESP8266ClientDeNittoDeutsch-")) // Clientname am Server
+    if (client.connect("ESP8266ClientDeNittoDeutsch-"))       // Clientname am Server
     {
       Serial.print("\nConnected to ");
       Serial.println(broker);
@@ -53,97 +53,95 @@ void reconnect()
 }
 
 
- /*** Funktion welche ausgeführt wird, wenn eine Nachricht auf einem abbonierten Topic ankommt ***/
+ // Funktion welche ausgeführt wird, wenn eine Nachricht auf einem abbonierten Topic ankommt
 void callback(char *topic, byte *payload, unsigned int length)
 {
-      Serial.print("Received messages!");
+  Serial.println("Received message:");
 
-
-
-      if(topic[24] == lati_topicMobile[24]){
-
+  if(topic[24] == lati_topicMobile[24]){
+        
         for (int i = 0; i < length; i++)
-  {
-    Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
-    latitude[i] = (char)payload[i];
-  }
-      
+        {
+          
+          Serial.printf("%c", (char)payload[i]);            // Ausgabe der gesamten Nachricht
+          latitude[i] = (char)payload[i];
+        }
+      Serial.println("");      
       client.publish(lati_topic, latitude);                 // Nachricht auf Topic publishen
       lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
-      lcd.println("Detecting lati..");                        // Ausgabe auf LCD-Display
+      lcd.println("Detecting lati..");                      // Ausgabe auf LCD-Display
       delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
       lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
       delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.clear();                                          // LCD-Display bereinigen
-      }
-
-      if(topic[26] == longi_topicMobile[26]){
-
-                for (int i = 0; i < length; i++)
-  {
-    Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
-    longitude[i] = (char)payload[i];
   }
-      
+
+  if(topic[26] == longi_topicMobile[26]){
+        for (int i = 0; i < length; i++)
+        {
+          
+          Serial.printf("%c", (char)payload[i]);            // Ausgabe der gesamten Nachricht
+          longitude[i] = (char)payload[i];
+        } 
+      Serial.println("");     
       client.publish(longi_topic, longitude);               // Nachricht auf Topic publishen
       lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
-      lcd.println("Detecting long..");                        // Ausgabe auf LCD-Display
+      lcd.println("Detecting long..");                      // Ausgabe auf LCD-Display
       delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
       lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
       delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.clear();                                          // LCD-Display bereinigen
       
-      }
-    if(topic[23] == wifi_topicMobile[23]){
-
-      for (int i = 0; i < length; i++)
-      {
-        Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
-        wifi[i] = (char)payload[i];
-      }
-      
+  }
+     
+  if(topic[23] == wifi_topicMobile[23]){
+        for (int i = 0; i < length; i++)
+        {
+          
+          Serial.printf("%c", (char)payload[i]);            // Ausgabe der gesamten Nachricht
+          wifi[i] = (char)payload[i];
+        } 
+      Serial.println("");     
       client.publish(wifi_topic, wifi);                     // Nachricht auf Topic publishen
       lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
-      lcd.println("Detecting net...");                        // Ausgabe auf LCD-Display
+      lcd.println("Detecting net...");                      // Ausgabe auf LCD-Display
       delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
       lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
       delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
       lcd.clear();                                          // LCD-Display bereinigen
-      
   }
+
   if(topic[25] == mobile_topicMobile[25]){
-
-    for (int i = 0; i < length; i++){
-      Serial.printf("%c", (char)payload[i]); // Ausgabe der gesamten Nachricht
-      mobile[i] = (char)payload[i];
-    }
-
-    client.publish(mobile_topic, mobile);                 // Nachricht auf Topic publishen
-    lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
-    lcd.println("Detecting cell..");                        // Ausgabe auf LCD-Display
-    delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
-    lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
-    lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
-    delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
-    lcd.clear();                                          // LCD-Display bereinigen
-        
-  }
-
-  Serial.println();
+        for (int i = 0; i < length; i++)
+        {
+          
+          Serial.printf("%c", (char)payload[i]);            // Ausgabe der gesamten Nachricht
+          mobile[i] = (char)payload[i];
+        }  
+      Serial.println("");    
+      client.publish(mobile_topic, mobile);                 // Nachricht auf Topic publishen
+      lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
+      lcd.println("Detecting cell..");                      // Ausgabe auf LCD-Display
+      delay(1000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.setCursor(0, 1);                                  // Curser des LCD-Displays auf 2. Zeile setzen
+      lcd.println("PWM received it!");                      // Ausgabe auf LCD-Display
+      delay(2000);                                          // Verzögerung, damit LCD-Anzeige gelesen werden kann
+      lcd.clear();                                          // LCD-Display bereinigen
+  }  
 }
 
  void setup()
-{
+ {
   Serial.begin(9600);
-  pinMode(LEDPIN, OUTPUT); // PIN für LED
-  pinMode(BUTTONPIN, INPUT); // PIN für Button
-  setupWifi(); // ESP mit WLAN verbinden
-  client.setServer(broker, 1883); // client mit Broker und Port verbinden
+  pinMode(LEDPIN, OUTPUT);                                  // PIN für LED
+  pinMode(BUTTONPIN, INPUT);                                // PIN für Button
+  setupWifi();                                              // ESP mit WLAN verbinden
+  client.setServer(broker, 1883);                           // client mit Broker und Port verbinden
   client.setCallback(callback);
-  digitalWrite(LEDPIN, HIGH); // LCD Screen
+  digitalWrite(LEDPIN, HIGH);                               // LCD Screen
 
   // LCD aktivieren, Farben setzen, Beide Zeilen mit Begrüßung etc. befüllen
   lcd.begin(16, 2); 
@@ -159,17 +157,18 @@ void callback(char *topic, byte *payload, unsigned int length)
 // ESP loop
 void loop()
 {
-  if (!client.connected()) // Wenn keine Verbindung besteht, reconnect() zum erneuten Verbindungsaufbau aufrufen
+  if (!client.connected())                                  // Wenn keine Verbindung besteht, reconnect() zum erneuten Verbindungsaufbau aufrufen
   {
     reconnect();
   }
   client.loop();
-  buttonState = digitalRead(BUTTONPIN); // aktuellen Button-Status (gedrückt oder nicht) abfragen
-  if (buttonState == HIGH) // Falls der Button gedrückt wurde...
+  buttonState = digitalRead(BUTTONPIN);                     // aktuellen Button-Status (gedrückt oder nicht) abfragen
+  if (buttonState == HIGH)                                  // Falls der Button gedrückt wurde...
   {
-    if (savedState != HIGH) // ...und der Status nicht vorher schon als "gedrückt" im savedState ist... 
+    if (savedState != HIGH)                                 // ...und der Status nicht vorher schon als "gedrückt" im savedState ist... 
     { 
-// Hier werden die Temperatur- und Luftfeuchtigkeit über den Sensor abgefragt, gepublished & Infos dazu auf dem LCD-Display ausgegeben
+
+      // Hier werden die Temperatur- und Luftfeuchtigkeit über den Sensor abgefragt, gepublished & Infos dazu auf dem LCD-Display ausgegeben
       lcd.clear();
       lcd.setCursor(1, 0);                                  // Curser des LCD-Displays auf 1. Zeile setzen
       lcd.println("Button pushed.  ");                      // Ausgabe auf LCD-Display
